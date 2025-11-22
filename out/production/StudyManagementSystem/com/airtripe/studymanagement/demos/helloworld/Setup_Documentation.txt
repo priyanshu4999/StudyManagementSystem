@@ -1,0 +1,83 @@
+Setup Documentation
+Java Development Environment Setup -
+
+TARGET : 
+    !! Install JDK and configure development environment
+    !! Successful Java compilation and execution.
+    !! Installation steps and environment variables
+
+Why I Did This
+I needed to set up a proper Java development environment for my project (StudyManagementSystem). At first, I just wanted to run a simple HelloWorld.java ,but ended up learning how the whole Java setup works — including what JDK, JRE, and JVM actually are, and how easy it is to get the versions mixed up.
+
+Understanding the Pieces
+- JVM (Java Virtual Machine): The engine that runs Java code. It reads .class files (bytecode) and turns them into machine instructions.
+- JRE (Java Runtime Environment): Includes the JVM and libraries needed to run Java programs — but not to compile them
+- JDK (Java Development Kit): Includes everything in the JRE plus tools like javac, jar, and javadoc. Required for compiling and developing Java programs.
+
+Step 1: Installing the JDK
+I downloaded the latest LTS version of Java (JDK 21) from https://www.oracle.com/java/technologies/downloads/#jdk21-windows. 
+After installation, my JDK was located here:
+C:\Program Files\Java\jdk-21
+
+Step 2: Setting Environment Variables
+1. Created JAVA_HOME = C:\Program Files\Java\jdk-21
+2. Edited the Path variable and added: %JAVA_HOME%\bin
+
+Step 3: Verifying the Setup
+I ran:
+java -version
+javac -version
+Both showed version 21, meaning everything was set correctly.
+
+Step 4: Testing a Simple Program
+I created HelloWorld.java:
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello WORLD");
+    }
+}
+
+Then ran:
+javac HelloWorld.java
+java HelloWorld
+
+It printed: Hello WORLD
+
+The Problems I Faced (and Fixed)
+
+1. javac not recognized
+I had set JAVA_HOME but forgot to add %JAVA_HOME%\bin to PATH. Adding it and reopening the terminal fixed this.
+
+2. Wrong command to run the class
+I ran java HelloWorld.class (wrong). The correct command is java HelloWorld.
+
+3. Compiled by a more recent version of Java Runtime
+I compiled with JDK 21 but my system ran Java 8 JRE (1.8.0_251). I removed the old JRE path and ensured only JDK 21 remained in PATH.
+
+4. The hidden javapath folder issue
+Running 'where java' showed:
+C:\Program Files (x86)\Common Files\Oracle\Java\javapath
+This folder contained shortcuts to the old JRE. I deleted it from PATH and verified that java and javac both pointed to:
+C:\Program Files\Java\jdk-21\bin
+
+Final Check
+After cleanup:
+java -version
+javac -version
+Both show Java 21.
+
+Lessons Learned
+- JRE is for running programs, JDK is for development.
+- PATH order matters when multiple Java versions are installed.
+- The Oracle javapath folder can override new installations.
+- Always verify versions using 'where java' and 'where javac'.
+
+Current Working Setup
+JAVA_HOME = C:\Program Files\Java\jdk-21
+Path includes = %JAVA_HOME%\bin
+java version = 21.0.1
+javac version = 21.0.1
+
+Everything now runs from the correct JDK. I can compile and run Java programs anywhere on my system, and I understand how each component (JDK, JRE, JVM) fits together.
+
+Setup complete!
