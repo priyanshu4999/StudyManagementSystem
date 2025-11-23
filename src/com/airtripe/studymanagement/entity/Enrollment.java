@@ -4,11 +4,15 @@ import java.time.LocalDate;
 
 // SERVES AS A JOINT FOR DBS STORING
 public class Enrollment {
-    public String id;
-    public String studentId;
-    public String courseId;
-    public LocalDate enrollmentDate;
-    private boolean passStatus;
+    private String id;
+    private String studentId;
+    private String courseId;
+    private LocalDate enrollmentDate;
+
+
+
+    private float grade;
+
 
     public Enrollment(String id, String studentId, String courseId) {
         this.id = id;
@@ -47,14 +51,15 @@ public class Enrollment {
     public void setEnrollmentDate(LocalDate enrollmentDate) {
         this.enrollmentDate = enrollmentDate;
     }
-
-    public boolean isPassStatus() {
-        return passStatus;
+    public float getGrade() {
+        return grade;
     }
 
-    public void setPassStatus(boolean passStatus) {
-        this.passStatus = passStatus;
+    public void setGrade(float grade) {
+        this.grade = grade;
     }
+
+
 
 
 }

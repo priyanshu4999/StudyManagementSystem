@@ -6,6 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Student extends Person {
+    private LocalDate dateOfJoining;
+    private List<Course> enrolledCourses =  new ArrayList<>();
+    private float GPA;
+
+    public float getGPA() {
+        return GPA;
+    }
+    public void setGPA(float GPA) {
+        this.GPA = GPA;
+    }
     public Student(String name , String id){
         super(name, id);
     }
@@ -30,9 +40,6 @@ public class Student extends Person {
     public void setEnrolledCourses(List<Course> enrolledCourses) {
         this.enrolledCourses = enrolledCourses;
     }
-
-    private LocalDate dateOfJoining;
-    private List<Course> enrolledCourses =  new ArrayList<>();
 
     @Override
     public String getRole() {

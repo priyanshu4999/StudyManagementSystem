@@ -9,7 +9,10 @@ public abstract class Person {
     private String phone;
     private int age;
 
-    public Person(String name , String id){}
+    public Person(String name , String id){
+        this.name = name;
+        this.id = id;
+    }
     public Person(String name, String id, String email, String phone, int age) {
         this.name = name;
         this.id = id;
