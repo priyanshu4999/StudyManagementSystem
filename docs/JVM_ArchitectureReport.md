@@ -1,7 +1,7 @@
 
 ---
 
-```md
+
 # 📘 JVM Architecture Report  
 *A practical, intuitive explanation of the JVM — how it works internally, why it exists, and how it actually runs our Java code.*
 
