@@ -35,7 +35,7 @@ Exposed endpoints for monitoring:
 | Setup Instructions | [docs/Setup_Instructions.md](docs/Setup_Instructions.md) |
 | System Documentation | [docs/System_Documentation.md](docs/System_Documentation.md) |
 
-> The assignment requirements and rubric are taken from the project brief (see PDF). :contentReference[oaicite:0]{index=0}
+> The assignment requirements and rubric are taken from the project brief
 
 ---
 
