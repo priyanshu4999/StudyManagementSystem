@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.stream.Collectors;
 
 public class RestServer {
@@ -41,6 +42,16 @@ public class RestServer {
         // HTTP SERVER
         // --------------------------------------------------------------------
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        //-------------------------
+        server.createContext("/", exchange -> {
+            File file = new File("static/index.html");  // path inside Docker container
+            byte[] bytes = Files.readAllBytes(file.toPath());
+
+            exchange.getResponseHeaders().add("Content-Type", "text/html");
+            exchange.sendResponseHeaders(200, bytes.length);
+            exchange.getResponseBody().write(bytes);
+            exchange.close();
+        });
 
 
         // ====================================================================
