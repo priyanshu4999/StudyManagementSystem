@@ -86,15 +86,11 @@ Below is the full checklist with ✔ indicating what *my project actually covers
 ### **Design Patterns (Bonus)**  
 - ✔ Singleton (MongoDBManager, DateTimeUtil)  
 - ✔ Builder (ResponseBuilder)  
-- ❌ Factory (not used)  
-- ❌ Observer (not used)
 
 ### **Exception Handling & File I/O (Bonus)** :contentReference[oaicite:4]{index=4}  
 - ✔ Custom exceptions  
-- ❌ File I/O (we implemented DB instead — more advanced)
+- ✔ Persistence ( implemented MongoDB instead )
 
-### **AI Integration (Bonus)**  
-- ❌ Not used
 
 ### **Extras I Implemented**  
 - ✔ Fully functional REST HTTP server  
