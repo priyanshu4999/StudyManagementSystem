@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Student Management API — Simple Client</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin: 20px; background:#f6f8fa; color:#222 }
+    h1 { margin-bottom: 6px }
+    .box { background:#fff; border-radius:8px; padding:16px; box-shadow:0 2px 6px rgba(0,0,0,0.06); margin-bottom:18px; }
+    label { display:block; margin-top:8px; font-size:0.95rem }
+    input[type="text"], textarea, select { width:100%; padding:8px; margin-top:6px; box-sizing:border-box; border:1px solid #ddd; border-radius:6px }
+    button { margin-top:10px; padding:8px 12px; border:none; border-radius:6px; background:#2563eb; color:#fff; cursor:pointer }
+    pre { background:#0b1220;color:#dbeafe;padding:12px;border-radius:6px; overflow:auto }
+    .row { display:flex; gap:12px; }
+    .col { flex:1 }
+    .small { font-size:0.9rem; color:#555 }
+    .response { margin-top:10px }
+  </style>
+</head>
+<body>
+
+  <h1>Student Management API — Client</h1>
+  <p class="small">Uses <strong>http://localhost:8080</strong>. Make sure your RestServer is running.</p>
+
+  <!-- STUDENTS -->
+  <div class="box">
+    <h2>Students</h2>
+
+    <div class="row">
+      <div class="col">
+        <label>Create student (POST /students)</label>
+        <input id="student-create-body" value="S1:Sonu">
+        <button id="btn-create-student">Create</button>
+      </div>
+      <div class="col">
+        <label>Get student by ID (GET /student?id=S1)</label>
+        <input id="student-get-id" value="S1">
+        <button id="btn-get-student">Fetch</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>List students (GET /students)</label>
+        <button id="btn-list-students">List</button>
+      </div>
+
+      <div class="col">
+        <label>Search by name (client-side)</label>
+        <input id="student-search-name" placeholder="e.g. son">
+        <button id="btn-search-students">Search</button>
+      </div>
+    </div>
+
+    <pre id="students-response">No output yet.</pre>
+  </div>
+
+  <!-- COURSES -->
+  <div class="box">
+    <h2>Courses</h2>
+
+    <div class="row">
+      <div class="col">
+        <label>Add course (POST /courses)</label>
+        <input id="course-create-body" value="C1:Maths:Raju Sir">
+        <button id="btn-create-course">Create</button>
+      </div>
+
+      <div class="col">
+        <label>List courses (GET /courses)</label>
+        <button id="btn-list-courses">List</button>
+      </div>
+    </div>
+
+    <label>Search (client-side)</label>
+    <input id="course-search-name">
+    <button id="btn-search-courses">Search</button>
+
+    <pre id="courses-response">No output yet.</pre>
+  </div>
+
+  <!-- ENROLLMENTS -->
+  <div class="box">
+    <h2>Enrollments</h2>
+
+    <div class="row">
+      <div class="col">
+        <label>Create enrollment (POST /enroll)</label>
+        <input id="enroll-create-body" value="E1:S1:C1">
+        <button id="btn-create-enroll">Create</button>
+      </div>
+
+      <div class="col">
+        <label>Update grade (GET /enrollment/updateGrade?...)</label>
+        <input id="enroll-grade-body" value="E1:88.5">
+        <button id="btn-update-grade">Update</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>List all enrollments (GET /enrollments)</label>
+        <button id="btn-list-enrollments">List All</button>
+      </div>
+    </div>
+
+    <pre id="enroll-response">No output yet.</pre>
+  </div>
+
+  <!-- RAW HTTP -->
+  <div class="box">
+    <h2>Raw HTTP Tester</h2>
+    <label>Path</label>
+    <input id="raw-path" value="/students">
+
+    <label>Method</label>
+    <select id="raw-method"><option>GET</option><option>POST</option></select>
+
+    <label>Body (for POST)</label>
+    <input id="raw-body" value="S2:Monu">
+
+    <button id="btn-raw-send">Send</button>
+
+    <pre id="raw-response">No output yet.</pre>
+  </div>
+
+  <script>
+      (function () {
+        const base = 'http://localhost:8080';
+
+        async function doFetch(path, method='GET', json=null) {
+          const opts = { method };
+
+          if (json) {
+            opts.headers = { 'Content-Type': 'application/json' };
+            opts.body = JSON.stringify(json);
+          }
+
+          try {
+            const res = await fetch(base + path, opts);
+            const text = await res.text();
+            return { ok: res.ok, status: res.status, text };
+          } catch (err) {
+            return { ok: false, status: 0, text: err.message };
+          }
+        }
+
+        // ============================================================
+        // STUDENTS
+        // ============================================================
+
+        // CREATE STUDENT
+        document.getElementById('btn-create-student').onclick = async () => {
+          const raw = document.getElementById('student-create-body').value;
+          const [id, name] = raw.split(':');
+
+          const r = await doFetch('/students', 'POST', {
+            id, name
+          });
+
+          out('students', r);
+        };
+
+        // LIST STUDENTS
+        document.getElementById('btn-list-students').onclick = async () => {
+          const r = await doFetch('/students');
+          out('students', r);
+          window.__students_list = parseList(r.text);
+        };
+
+        // GET ONE STUDENT
+        document.getElementById('btn-get-student').onclick = async () => {
+          const id = document.getElementById('student-get-id').value;
+          const r = await doFetch('/student?id=' + id);
+          out('students', r);
+        };
+
+        // CLIENT-SIDE SEARCH
+        document.getElementById('btn-search-students').onclick = () => {
+          const q = document.getElementById('student-search-name').value.toLowerCase();
+          const list = (window.__students_list || []).filter(l => l.toLowerCase().includes(q));
+          document.getElementById('students-response').textContent = list.join('\n') || 'No matches.';
+        };
+
+
+        // ============================================================
+        // COURSES
+        // ============================================================
+
+        document.getElementById('btn-create-course').onclick = async () => {
+          const raw = document.getElementById('course-create-body').value;
+          const [id, name, instructor] = raw.split(':');
+
+          const r = await doFetch('/courses', 'POST', {
+            id, name, instructor
+          });
+
+          out('courses', r);
+        };
+
+        document.getElementById('btn-list-courses').onclick = async () => {
+          const r = await doFetch('/courses');
+          out('courses', r);
+          window.__courses_list = parseList(r.text);
+        };
+
+        document.getElementById('btn-search-courses').onclick = () => {
+          const q = document.getElementById('course-search-name').value.toLowerCase();
+          const list = (window.__courses_list || []).filter(l => l.toLowerCase().includes(q));
+          document.getElementById('courses-response').textContent = list.join('\n') || 'No matches.';
+        };
+
+
+        // ============================================================
+        // ENROLLMENTS
+        // ============================================================
+
+        // CREATE ENROLLMENT
+        document.getElementById('btn-create-enroll').onclick = async () => {
+          const raw = document.getElementById('enroll-create-body').value;
+          const [id, studentId, courseId] = raw.split(':');
+
+          const r = await doFetch('/enroll', 'POST', {
+            id, studentId, courseId
+          });
+
+          out('enroll', r);
+        };
+
+        // LIST ENROLLMENTS
+        document.getElementById('btn-list-enrollments').onclick = async () => {
+          const r = await doFetch('/enrollments');
+          out('enroll', r);
+        };
+
+        // UPDATE GRADE (new server: PUT /enrollment?enroll=E1&grade=88.5)
+        document.getElementById('btn-update-grade').onclick = async () => {
+          const raw = document.getElementById('enroll-grade-body').value;
+          const [id, grade] = raw.split(':');
+
+          const r = await doFetch(`/enrollment/updateGrade?enroll=${id}&grade=${grade}`, 'GET');
+          out('enroll', r);
+        };
+
+
+        // ============================================================
+        // RAW HTTP TESTER
+        // ============================================================
+        document.getElementById('btn-raw-send').onclick = async () => {
+          const path = document.getElementById('raw-path').value;
+          const method = document.getElementById('raw-method').value;
+          const raw = document.getElementById('raw-body').value;
+
+          // try parsing JSON automatically
+          let json = null;
+          try {
+            if (method === 'POST') {
+              const [id, name] = raw.split(':');
+              json = { id, name };
+            }
+          } catch {}
+
+          const r = await doFetch(path, method, json);
+          out('raw', r);
+        };
+
+
+        // ============================================================
+        // UTIL
+        // ============================================================
+
+        function out(section, resp) {
+          document.getElementById(section + '-response').textContent =
+            `Status: ${resp.status}\n${resp.ok ? 'OK' : 'ERROR'}\n\n${resp.text}`;
+        }
+
+        function parseList(text) {
+          return text.split('\n').map(x => x.trim()).filter(Boolean);
+        }
+
+      })();
+  </script>
+
+
+</body>
+</html>

@@ -2,45 +2,61 @@ package com.airtripe.studymanagement.service;
 
 import com.airtripe.studymanagement.entity.Student;
 import com.airtripe.studymanagement.exception.StudentNotFoundException;
+import com.airtripe.studymanagement.DatabasePersistence.StudentRepository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class StudentService {
-    private final Map<String , Student> students = new HashMap<>();
 
+    private final StudentRepository repo = new StudentRepository();
+
+    // -------------------------------------------------------
+    // READ (ID)
+    // -------------------------------------------------------
     public Student getStudentById(String id) {
-        Student res = students.get(id);
-        if (res == null){
-            throw new StudentNotFoundException(id);
-        }
-        return res;
+        Student s = repo.findById(id);
+        if (s == null) throw new StudentNotFoundException(id);
+        return s;
+    }
 
+    // -------------------------------------------------------
+    // READ (NAME SEARCH)
+    // -------------------------------------------------------
+    public List<Student> getStudentByName(String name) {
+        return repo.findByName(name);
     }
-    public List<Student> getStudentByName(String name){
-        return  students.values().stream().filter(s -> s.getName().toLowerCase().contains(name.toLowerCase()))
-                .collect(Collectors.toList());
-    }
+
+    // -------------------------------------------------------
+    // CREATE
+    // -------------------------------------------------------
     public void createStudent(Student s) {
-        students.put(s.getId(), s);
-    }
-    public void updateStudent(String id, Student s ) {
-        if (!students.containsKey(id)) {
-            throw new StudentNotFoundException(id);
-        }
-        students.put(id, s);
-    }
-    public void deleteStudent(String id) {
-        if (!students.containsKey(id)) {
-            throw new StudentNotFoundException(id);
-        }
-        students.remove(id);
-    }
-    public List<Student> listAllStudents() {
-        return new ArrayList<>(students.values());
+        repo.save(s);
     }
 
+    // -------------------------------------------------------
+    // UPDATE
+    // -------------------------------------------------------
+    public void updateStudent(String id, Student s) {
+        Student existing = repo.findById(id);
+        if (existing == null) throw new StudentNotFoundException(id);
+
+        repo.update(s);
+    }
+
+    // -------------------------------------------------------
+    // DELETE
+    // -------------------------------------------------------
+    public void deleteStudent(String id) {
+        Student existing = repo.findById(id);
+        if (existing == null) throw new StudentNotFoundException(id);
+
+        repo.delete(id);
+    }
+
+    // -------------------------------------------------------
+    // READ ALL
+    // -------------------------------------------------------
+    public List<Student> listAllStudents() {
+        return repo.findAll();
+    }
 }

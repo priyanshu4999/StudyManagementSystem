@@ -2,44 +2,61 @@ package com.airtripe.studymanagement.service;
 
 import com.airtripe.studymanagement.entity.Course;
 import com.airtripe.studymanagement.exception.CourcesNotFoundException;
+import com.airtripe.studymanagement.DatabasePersistence.CourseRepository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CourseService {
 
-    private final Map<String , Course> courses = new HashMap<>();
+    private final CourseRepository repo = new CourseRepository();
 
-    public void addCourse(Course course)
-    {
-        courses.put(course.getId(), course);
-    }
-    public Course getCourseById(String id)
-    {   if (!courses.containsKey(id)) throw new CourcesNotFoundException(id);
-        return courses.get(id);
+    // -------------------------------------------------------
+    // CREATE
+    // -------------------------------------------------------
+    public void addCourse(Course course) {
+        repo.save(course);
     }
 
-    public List<Course> listAllCourses()
-    {
-        return new ArrayList<>(courses.values());
+    // -------------------------------------------------------
+    // READ
+    // -------------------------------------------------------
+    public Course getCourseById(String id) {
+        Course c = repo.findById(id);
+        if (c == null) throw new CourcesNotFoundException(id);
+        return c;
     }
 
-    public void deleteCourse(String id)
-    {
-        if (!courses.containsKey(id)) throw new CourcesNotFoundException(id);
-        courses.remove(id);
+    public List<Course> listAllCourses() {
+        return repo.findAll();
     }
-    public void updateCourse(String id, Course course)
-    {
-        if (!courses.containsKey(id)) throw new CourcesNotFoundException(id);
-        courses.put(id, course);
+
+    // -------------------------------------------------------
+    // UPDATE
+    // -------------------------------------------------------
+    public void updateCourse(String id, Course newCourse) {
+        Course existing = repo.findById(id);
+        if (existing == null) throw new CourcesNotFoundException(id);
+
+        repo.update(newCourse);  // new method in repository
     }
-    public List<Course> getCourseByName(String name)
-    {
-        return courses.values().stream()
+
+    // -------------------------------------------------------
+    // DELETE
+    // -------------------------------------------------------
+    public void deleteCourse(String id) {
+        Course c = repo.findById(id);
+        if (c == null) throw new CourcesNotFoundException(id);
+
+        repo.delete(id);
+    }
+
+    // -------------------------------------------------------
+    // SEARCH (Name contains)
+    // -------------------------------------------------------
+    public List<Course> getCourseByName(String name) {
+        return repo.findAll()
+                .stream()
                 .filter(c -> c.getName().toLowerCase().contains(name.toLowerCase()))
                 .collect(Collectors.toList());
     }

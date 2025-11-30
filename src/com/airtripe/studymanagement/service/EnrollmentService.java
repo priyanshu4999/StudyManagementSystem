@@ -1,72 +1,88 @@
 package com.airtripe.studymanagement.service;
 
 import com.airtripe.studymanagement.entity.Enrollment;
-import com.airtripe.studymanagement.service.StudentService;
-import com.airtripe.studymanagement.service.CourseService;
+import com.airtripe.studymanagement.entity.Student;
+import com.airtripe.studymanagement.entity.Course;
 
-import java.util.*;
+import com.airtripe.studymanagement.DatabasePersistence.EnrollmentRepository;
+
+import java.util.List;
 
 public class EnrollmentService {
 
-    private final Map<String, Enrollment> enrollments = new HashMap<>();
     private final StudentService studentService;
     private final CourseService courseService;
+    private final EnrollmentRepository repo = new EnrollmentRepository();
 
-    public EnrollmentService(StudentService studentService, CourseService courseService) {
-        this.studentService = studentService;
-        this.courseService = courseService;
+    public EnrollmentService(StudentService ss, CourseService cs) {
+        this.studentService = ss;
+        this.courseService = cs;
     }
 
+    // --------------------------------------------------------
+    // CREATE
+    // --------------------------------------------------------
     public Enrollment createEnrollment(String id, String studentId, String courseId) {
-        studentService.getStudentById(studentId);
-        courseService.getCourseById(courseId);
+
+        // Validate student + course
+        Student student = studentService.getStudentById(studentId);
+        if (student == null)
+            throw new RuntimeException("Student not found: " + studentId);
+
+        Course course = courseService.getCourseById(courseId);
+        if (course == null)
+            throw new RuntimeException("Course not found: " + courseId);
+
         Enrollment e = new Enrollment(id, studentId, courseId);
-        enrollments.put(id, e);
+        repo.save(e);
+
+        // Keep your original behavior:
+        student.enrollInCourse(course);
+
         return e;
     }
 
-
+    // --------------------------------------------------------
+    // READ
+    // --------------------------------------------------------
     public Enrollment getEnrollmentById(String id) {
-        Enrollment e = enrollments.get(id);
+        Enrollment e = repo.findById(id);
         if (e == null)
-            throw new IllegalArgumentException("Enrollment with id " + id + " not found");
+            throw new RuntimeException("Enrollment not found: " + id);
         return e;
     }
-
-
-    public List<Enrollment> listAllEnrollments() {
-        return new ArrayList<>(enrollments.values());
-    }
-
 
     public List<Enrollment> getEnrollmentsByStudent(String studentId) {
-        return enrollments.values().stream()
-                .filter(e -> e.getStudentId().equals(studentId))
-                .toList();
+        return repo.findByStudent(studentId);
     }
-
 
     public List<Enrollment> getEnrollmentsByCourse(String courseId) {
-        return enrollments.values().stream()
-                .filter(e -> e.getCourseId().equals(courseId))
-                .toList();
+        return repo.findByCourse(courseId);
     }
 
+    public List<Enrollment> listAllEnrollments() {
+        return repo.findAll();
+    }
 
+    // --------------------------------------------------------
+    // UPDATE
+    // --------------------------------------------------------
     public void updateGrade(String enrollmentId, float grade) {
-        Enrollment e = enrollments.get(enrollmentId);
-
+        Enrollment e = repo.findById(enrollmentId);
         if (e == null)
-            throw new IllegalArgumentException("Enrollment with id " + enrollmentId + " not found");
+            throw new RuntimeException("Enrollment not found: " + enrollmentId);
 
-        e.setGrade(grade);
+        repo.updateGrade(enrollmentId, grade);
     }
 
-    // DELETE ENROLLMENT
+    // --------------------------------------------------------
+    // DELETE
+    // --------------------------------------------------------
     public void deleteEnrollment(String id) {
-        if (!enrollments.containsKey(id))
-            throw new IllegalArgumentException("Enrollment with id " + id + " not found");
+        Enrollment e = repo.findById(id);
+        if (e == null)
+            throw new RuntimeException("Enrollment not found: " + id);
 
-        enrollments.remove(id);
+        repo.delete(id);
     }
 }
