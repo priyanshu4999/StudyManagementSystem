@@ -47,9 +47,9 @@ This is based directly on the course assignment brief. :contentReference[oaicite
 
 ---
 
-# ✅ Requirements Checklist (From PDF + What I Implemented)
+# ✅ Requirements Checklist 
 
-Below is the full checklist with ✔ indicating what *my project actually covers*.
+Below is the full checklist with ✔ indicating what is actually covered.
 
 ### **Core Java + OOP (Required)**  
 - ✔ Encapsulation  
